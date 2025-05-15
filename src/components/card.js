@@ -1,6 +1,3 @@
-import { handleImagePopup } from "../scripts/index.js";
-
-const placeList = document.querySelector('.places__list');
 const cardTemplate = document.querySelector('#card-template').content;
 
 function cardAdd(dataCard, deleteCard, likeClick, handleImagePopup) {

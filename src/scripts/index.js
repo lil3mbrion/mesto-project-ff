@@ -31,15 +31,6 @@ const formNewCard = document.forms['new-place'];
 const titleInput = formNewCard.querySelector('.popup__input_type_card-name');
 const urlInput = formNewCard.querySelector('.popup__input_type_url');
 
-export function handleEscape(evt) {
-  if (evt.key === 'Escape') {
-    const openedPopup = document.querySelector('.popup_is-opened');
-    if (openedPopup) {
-      closePopup(openedPopup);
-    }
-  }
-}
-
 export function handleImagePopup(dataCard) {
   const imagePopup = zoomPopup.querySelector('.popup__image');
   const captionPopup = zoomPopup.querySelector('.popup__caption');
