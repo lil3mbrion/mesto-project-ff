@@ -1,0 +1,10 @@
+.card__like-place {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
+  line-height: 100%;
+  font-weight: 400;
+  row-gap: 3px;
+}
