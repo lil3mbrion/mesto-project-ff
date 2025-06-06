@@ -1,79 +1,46 @@
-import { nameProfile, dscrProfile, profileImage, handleImagePopup, placeList} from "../scripts/index.js"
-import { cardAdd, deleteCard, likeClick } from "../components/card.js";
-
-let currentUserId;
-
-function renderCard(card) {
-  placeList.append(card);
+function checkRes (res) {
+  if (res.ok) {
+    return res.json();
+  } else {
+    return Promise.reject(`Ошибка: ${res.status}`)
+  }
 }
 
-const updateProfile = (userData) => {
-  nameProfile.textContent = userData.name
-  dscrProfile.textContent = userData.about
-  profileImage.style.backgroundImage = `url('${userData.avatar}')`
-}
-
-const loadCleanAvatarUrl = () => {
-  return fetch('https://nomoreparties.co/v1/wff-cohort-39/users/me', {
-    headers: {
-      authorization: 'd1c2fddb-87a6-4562-b49e-98d228179b39'
-    }
+const loadCleanAvatarUrl = (settings) => {
+  return fetch(`${settings.baseUrl}/users/me`, {
+    headers: settings.headers
   })
-    .then(res => res.json())
-    .then((result) => {
-      return result.avatar
-    })
+    .then(checkRes)
 }
 
-const loadUsersCards = () => {
-  return fetch('https://mesto.nomoreparties.co/v1/wff-cohort-39/cards', {
-    headers: {
-      authorization: 'd1c2fddb-87a6-4562-b49e-98d228179b39'
-    }
+const loadUsersCards = (settings) => {
+  return fetch(`${settings.baseUrl}/cards`, {
+    headers: settings.headers
   })
-    .then(res => res.json())
-    .then((cards) => {
-      cards.forEach(function (card){
-        renderCard(cardAdd(card, deleteCard, likeClick, handleImagePopup));
-      });
-      return cards;
-    })
+    .then(checkRes)
 }
 
-const loadUserInfo = () => {
-  return fetch('https://nomoreparties.co/v1/wff-cohort-39/users/me', {
-    headers: {
-      authorization: 'd1c2fddb-87a6-4562-b49e-98d228179b39'
-    }
+const loadUserInfo = (settings) => {
+  return fetch(`${settings.baseUrl}/users/me`, {
+    headers: settings.headers
   })
-    .then(res => res.json())
-    .then((result) => {
-      currentUserId = result._id;
-      updateProfile(result);
-      return result, currentUserId;
-    })
+    .then(checkRes)
 }
 
-const uploadUserAvatar = (userAvatar) => {
-  return fetch('https://nomoreparties.co/v1/wff-cohort-39/users/me/avatar', {
+const uploadUserAvatar = (userAvatar, settings) => {
+  return fetch(`${settings.baseUrl}/users/me/avatar`, {
     method: 'PATCH',
-    headers: {
-      authorization: 'd1c2fddb-87a6-4562-b49e-98d228179b39',
-      'Content-Type': 'application/json'
-    },
+    headers: settings.headers,
     body: JSON.stringify({
       avatar: userAvatar
     })
   });
 }
 
-const uploadUserInfo = (userName, userDscr) => {
-  return fetch('https://nomoreparties.co/v1/wff-cohort-39/users/me', {
+const uploadUserInfo = (userName, userDscr, settings) => {
+  return fetch(`${settings.baseUrl}/users/me`, {
     method: 'PATCH',
-    headers: {
-      authorization: 'd1c2fddb-87a6-4562-b49e-98d228179b39',
-      'Content-Type': 'application/json'
-    },
+    headers: settings.headers,
     body: JSON.stringify({
       name: userName,
       about: userDscr
@@ -81,13 +48,10 @@ const uploadUserInfo = (userName, userDscr) => {
   });
 }
 
-const postNewCard = (titleCard, urlCard) => {
-  return fetch('https://nomoreparties.co/v1/wff-cohort-39/cards', {
+const postNewCard = (titleCard, urlCard, settings) => {
+  return fetch(`${settings.baseUrl}/cards`, {
     method: 'POST',
-    headers: {
-      authorization: 'd1c2fddb-87a6-4562-b49e-98d228179b39',
-      'Content-Type': 'application/json'
-    },
+    headers: settings.headers,
     body: JSON.stringify({
       name: titleCard,
       link: urlCard
@@ -95,5 +59,29 @@ const postNewCard = (titleCard, urlCard) => {
   });
 }
 
-export {loadCleanAvatarUrl, loadUsersCards, loadUserInfo, uploadUserAvatar, uploadUserInfo, postNewCard, currentUserId};
+const deleteCardRequest = (cardId, settings) => {
+  return fetch(`${settings.baseUrl}/cards/${cardId}`, {
+    method: 'DELETE',
+    headers: settings.headers,
+  })
+    .then(checkRes)
+}
+
+const putLike = (cardId, settings) => {
+  return fetch(`${settings.baseUrl}/cards/likes/${cardId}`, {
+    method: 'PUT',
+    headers: settings.headers,
+  })
+    .then(checkRes)
+}
+
+const deleteLike = (cardId, settings) => {
+  return fetch(`${settings.baseUrl}/cards/likes/${cardId}`, {
+    method: 'DELETE',
+    headers: settings.headers,
+  })
+    .then(checkRes)
+}
+
+export { loadCleanAvatarUrl, loadUsersCards, loadUserInfo, uploadUserAvatar, uploadUserInfo, postNewCard, deleteCardRequest, putLike, deleteLike };
 

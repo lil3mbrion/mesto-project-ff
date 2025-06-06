@@ -10,7 +10,7 @@
 import '../pages/index.css';
 import { cardAdd, deleteCard, likeClick } from "../components/card.js";
 import { openPopup, closePopup, overlayClick } from "../components/popup.js";
-import {enableValidation, clearValidation, validationSettings} from "../components/validation.js";
+import {enableValidation, clearValidation} from "../components/validation.js";
 import {loadCleanAvatarUrl, loadUsersCards, loadUserInfo, uploadUserAvatar, uploadUserInfo, postNewCard} from "../components/api.js";
 
 const placeList = document.querySelector('.places__list');
@@ -40,6 +40,31 @@ const urlInput = formNewCard.querySelector('.popup__input_type_url');
 const buttonSubmitAvatar = formAvatarCard.querySelector('.popup__button');
 const buttonSubmitEdit = formEditCard.querySelector('.popup__button');
 const buttonSubmitNewCard = formNewCard.querySelector('.popup__button');
+let currentUserId = null;
+
+const validationSettings = {
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  buttonSelector: '.popup__button',
+  inactiveButtonClass: 'button_inactive',
+  errorSelectorClass: 'form__input-error_active',
+  inputSelectorClass: 'form__input_type_error',
+  baseUrl: 'https://nomoreparties.co/v1/wff-cohort-39',
+  headers: {
+    authorization: 'd1c2fddb-87a6-4562-b49e-98d228179b39',
+    'Content-Type': 'application/json'
+  }
+}
+
+function renderCard(card) {
+  placeList.append(card);
+}
+
+const updateProfile = (userData) => {
+  nameProfile.textContent = userData.name
+  dscrProfile.textContent = userData.about
+  profileImage.style.backgroundImage = `url('${userData.avatar}')`
+}
 
 function handleImagePopup(dataCard) {
   const imagePopup = zoomPopup.querySelector('.popup__image');
@@ -62,7 +87,10 @@ editButton.addEventListener('click', function() {
 });
 
 avatarButton.addEventListener('click', function() {
-  loadCleanAvatarUrl()
+  loadCleanAvatarUrl(validationSettings)
+    .then((result) => {
+      return result.avatar
+    })
     .then((res) => {
       avatarUrlInput.value = res;
     })
@@ -79,6 +107,7 @@ closeButtonAvatar.addEventListener('click', function(evt) {
 });
 
 addButton.addEventListener('click', function() {
+  clearValidation(formNewCard, validationSettings)
   openPopup(newPopup);
 });
 
@@ -94,10 +123,13 @@ function handleFormAvatarSubmit(evt) {
   evt.preventDefault();
   buttonSubmitAvatar.textContent = 'Сохранение...';
   buttonSubmitAvatar.disabled = true;
-  uploadUserAvatar(avatarUrlInput.value)
+  uploadUserAvatar(avatarUrlInput.value, validationSettings)
     .then(() => {
       profileImage.style.backgroundImage = `url('${avatarUrlInput.value}')`
       closePopup(avatarPopup);
+    })
+    .catch((err) => {
+      console.log('Ошибка:', err);
     })
     .finally(() => {
       buttonSubmitAvatar.textContent = 'Сохранить';
@@ -111,11 +143,14 @@ function handleFormEditSubmit(evt) {
   evt.preventDefault();
   buttonSubmitEdit.textContent = 'Сохранение...';
   buttonSubmitEdit.disabled = true;
-  uploadUserInfo(nameInput.value, jobInput.value)
+  uploadUserInfo(nameInput.value, jobInput.value, validationSettings)
   .then(() => {
     nameProfile.textContent = nameInput.value;
     dscrProfile.textContent = jobInput.value;
     closePopup(editPopup);
+  })
+  .catch((err) => {
+    console.log('Ошибка:', err);
   })
   .finally(() => {
     buttonSubmitEdit.textContent = 'Сохранить';
@@ -129,15 +164,17 @@ function newCardSubmit(evt) {
   evt.preventDefault();
   buttonSubmitNewCard.textContent = 'Сохранение...';
   buttonSubmitNewCard.disabled = true;
-  postNewCard(titleInput.value, urlInput.value)
+  postNewCard(titleInput.value, urlInput.value, validationSettings)
     .then((res) => {
       return res.json();
     })
     .then((dataCard) => {
-      placeList.prepend(cardAdd(dataCard, deleteCard, likeClick, handleImagePopup));
+      placeList.prepend(cardAdd(dataCard, deleteCard, likeClick, handleImagePopup, validationSettings));
       closePopup(newPopup);
       formNewCard.reset();
-      clearValidation(formNewCard, validationSettings)
+    })
+    .catch((err) => {
+      console.log('Ошибка:', err);
     })
     .finally(() => {
       buttonSubmitNewCard.textContent = 'Сохранить';
@@ -147,14 +184,22 @@ function newCardSubmit(evt) {
 
 formNewCard.addEventListener('submit', newCardSubmit);
 
-enableValidation();
+enableValidation(validationSettings);
 
-Promise.all([loadUserInfo(), loadUsersCards()])
+Promise.all([loadUserInfo(validationSettings), loadUsersCards(validationSettings)])
   .then(([result, cards]) => {
-    console.log('Данные загружены:', { result, cards });
+    currentUserId = result._id;
+    updateProfile(result);
+    cards.forEach(function (card){
+      renderCard(cardAdd(card, deleteCard, likeClick, handleImagePopup, currentUserId, validationSettings));
+    });
+    return {result, currentUserId, cards}
+  })
+  .catch((err) => {
+    console.log('Ошибка:', err);
   })
 
-export{ nameProfile, dscrProfile, profileImage, handleImagePopup, placeList}
+
 
 
 
