@@ -2,7 +2,7 @@ import { deleteCardRequest, putLike, deleteLike } from "../components/api.js"
 
 const cardTemplate = document.querySelector('#card-template').content;
 
-function cardAdd(dataCard, deleteCard, likeClick, handleImagePopup, userId, settings) {
+function cardAdd(dataCard, deleteCard, likeClick, handleImagePopup, userId) {
   const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true);
   const cardImg = cardElement.querySelector('.card__image');
   const cardTitle = cardElement.querySelector('.card__title');
@@ -30,7 +30,7 @@ function cardAdd(dataCard, deleteCard, likeClick, handleImagePopup, userId, sett
     deleteButton.remove();
   } else {
     deleteButton.addEventListener('click', function(){
-      deleteCard(cardElement, dataCard._id, settings);
+      deleteCard(cardElement, dataCard._id);
     }); 
   } 
 
@@ -39,7 +39,7 @@ function cardAdd(dataCard, deleteCard, likeClick, handleImagePopup, userId, sett
   });
   
   likeButton.addEventListener('click', function(evt) {
-    likeClick(evt, likeCounter, dataCard._id, settings)
+    likeClick(evt, likeCounter, dataCard._id)
   });
 
   likeCounter.textContent = dataCard.likes.length;
@@ -47,11 +47,11 @@ function cardAdd(dataCard, deleteCard, likeClick, handleImagePopup, userId, sett
   return cardElement;
 }
 
-function likeClick(evt, likeElement, cardId, settings) {
+function likeClick(evt, likeElement, cardId) {
   const isLiked = evt.target.classList.contains('card__like-button_is-active');
 
   if (isLiked) {
-    deleteLike(cardId, settings)
+    deleteLike(cardId)
       .then((card) => {
         evt.target.classList.remove('card__like-button_is-active')
         likeElement.textContent = card.likes.length
@@ -60,7 +60,7 @@ function likeClick(evt, likeElement, cardId, settings) {
         console.log('Ошибка:', err);
       })
   } else {
-    putLike(cardId, settings)
+    putLike(cardId)
       .then((card) => {
         evt.target.classList.add('card__like-button_is-active')
         likeElement.textContent = card.likes.length
@@ -71,8 +71,8 @@ function likeClick(evt, likeElement, cardId, settings) {
   }
 }
 
-function deleteCard(cardElement, cardId, settings) {
-  deleteCardRequest(cardId, settings)
+function deleteCard(cardElement, cardId) {
+  deleteCardRequest(cardId)
     .then(() => {
       cardElement.remove(); 
     })

@@ -1,3 +1,12 @@
+const apiSettings = {
+  baseUrl: 'https://nomoreparties.co/v1/wff-cohort-39',
+  headers: {
+    authorization: 'd1c2fddb-87a6-4562-b49e-98d228179b39',
+    'Content-Type': 'application/json'
+  }
+}
+
+
 function checkRes (res) {
   if (res.ok) {
     return res.json();
@@ -6,82 +15,84 @@ function checkRes (res) {
   }
 }
 
-const loadCleanAvatarUrl = (settings) => {
-  return fetch(`${settings.baseUrl}/users/me`, {
-    headers: settings.headers
+const loadUsersCards = () => {
+  return fetch(`${apiSettings.baseUrl}/cards`, {
+    headers: apiSettings.headers
   })
     .then(checkRes)
 }
 
-const loadUsersCards = (settings) => {
-  return fetch(`${settings.baseUrl}/cards`, {
-    headers: settings.headers
+const loadUserInfo = () => {
+  return fetch(`${apiSettings.baseUrl}/users/me`, {
+    headers: apiSettings.headers
   })
     .then(checkRes)
 }
 
-const loadUserInfo = (settings) => {
-  return fetch(`${settings.baseUrl}/users/me`, {
-    headers: settings.headers
-  })
-    .then(checkRes)
-}
-
-const uploadUserAvatar = (userAvatar, settings) => {
-  return fetch(`${settings.baseUrl}/users/me/avatar`, {
+const uploadUserAvatar = (userAvatar) => {
+  return fetch(`${apiSettings.baseUrl}/users/me/avatar`, {
     method: 'PATCH',
-    headers: settings.headers,
+    headers: apiSettings.headers,
     body: JSON.stringify({
       avatar: userAvatar
     })
-  });
+  })
+    .catch((err) => {
+      console.log('Ошибка:', err);
+    })
 }
 
-const uploadUserInfo = (userName, userDscr, settings) => {
-  return fetch(`${settings.baseUrl}/users/me`, {
+const uploadUserInfo = (userName, userDscr) => {
+  return fetch(`${apiSettings.baseUrl}/users/me`, {
     method: 'PATCH',
-    headers: settings.headers,
+    headers: apiSettings.headers,
     body: JSON.stringify({
       name: userName,
       about: userDscr
     })
-  });
+  })
+    .catch((err) => {
+      console.log('Ошибка:', err);
+    })
 }
 
-const postNewCard = (titleCard, urlCard, settings) => {
-  return fetch(`${settings.baseUrl}/cards`, {
+const postNewCard = (titleCard, urlCard) => {
+  return fetch(`${apiSettings.baseUrl}/cards`, {
     method: 'POST',
-    headers: settings.headers,
+    headers: apiSettings.headers,
     body: JSON.stringify({
       name: titleCard,
       link: urlCard
     })
-  });
+  })
+    .catch((err) => {
+      console.log('Ошибка:', err);
+    })
 }
 
-const deleteCardRequest = (cardId, settings) => {
-  return fetch(`${settings.baseUrl}/cards/${cardId}`, {
+const deleteCardRequest = (cardId) => {
+  return fetch(`${apiSettings.baseUrl}/cards/${cardId}`, {
     method: 'DELETE',
-    headers: settings.headers,
+    headers: apiSettings.headers,
   })
     .then(checkRes)
 }
 
-const putLike = (cardId, settings) => {
-  return fetch(`${settings.baseUrl}/cards/likes/${cardId}`, {
+const putLike = (cardId) => {
+  return fetch(`${apiSettings.baseUrl}/cards/likes/${cardId}`, {
     method: 'PUT',
-    headers: settings.headers,
+    headers: apiSettings.headers,
   })
     .then(checkRes)
 }
 
-const deleteLike = (cardId, settings) => {
-  return fetch(`${settings.baseUrl}/cards/likes/${cardId}`, {
+const deleteLike = (cardId) => {
+  return fetch(`${apiSettings.baseUrl}/cards/likes/${cardId}`, {
     method: 'DELETE',
-    headers: settings.headers,
+    headers: apiSettings.headers,
   })
     .then(checkRes)
 }
 
-export { loadCleanAvatarUrl, loadUsersCards, loadUserInfo, uploadUserAvatar, uploadUserInfo, postNewCard, deleteCardRequest, putLike, deleteLike };
+export { loadUsersCards, loadUserInfo, uploadUserAvatar, uploadUserInfo, postNewCard, deleteCardRequest, putLike, deleteLike };
 
