@@ -153,9 +153,6 @@ function newCardSubmit(evt) {
   buttonSubmitNewCard.textContent = 'Сохранение...';
   buttonSubmitNewCard.disabled = true;
   postNewCard(titleInput.value, urlInput.value)
-    .then((res) => {
-      return res.json();
-    })
     .then((dataCard) => {
       placeList.prepend(cardAdd(dataCard, deleteCard, likeClick, handleImagePopup, currentUserId));
       closePopup(newPopup);

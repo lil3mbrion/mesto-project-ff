@@ -37,9 +37,7 @@ const uploadUserAvatar = (userAvatar) => {
       avatar: userAvatar
     })
   })
-    .catch((err) => {
-      console.log('Ошибка:', err);
-    })
+    .then(checkRes)
 }
 
 const uploadUserInfo = (userName, userDscr) => {
@@ -51,9 +49,7 @@ const uploadUserInfo = (userName, userDscr) => {
       about: userDscr
     })
   })
-    .catch((err) => {
-      console.log('Ошибка:', err);
-    })
+    .then(checkRes)
 }
 
 const postNewCard = (titleCard, urlCard) => {
@@ -65,9 +61,7 @@ const postNewCard = (titleCard, urlCard) => {
       link: urlCard
     })
   })
-    .catch((err) => {
-      console.log('Ошибка:', err);
-    })
+    .then(checkRes)
 }
 
 const deleteCardRequest = (cardId) => {
